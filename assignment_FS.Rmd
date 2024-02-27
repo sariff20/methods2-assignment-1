@@ -56,6 +56,8 @@ probability
 
 ```{r task2}
 
+?rnorm()
+
 save_perunit <- 5
 save_perunit_se <- 4
 market <- 40000
@@ -90,18 +92,70 @@ mean(savings)
     
 ```{r task3 - a,b }
 
-firstpart_diff_mean <- 600
-firstpart_diff_sd <- 400
-firstpart_df <- 50
-secondpart_diff_mean <- 3
-secondpart_diff_sd <- 1
-secondpart_df <- 100
+cost_diff_mean <- 600
+cost_diff_se <- 400
+cost_df <- 50
+effect_diff_mean <- 3
+effect_diff_se <- 1
+effect_df <- 100
+
+cost_diff_sd <- cost_diff_se*sqrt(cost_df)
+effect_diff_sd <- effect_diff_se*sqrt(effect_df)
 
 n_sims <- 1000
-cost_diff <- rep(NA, n_sims)
-effectiveness <- rep(NA, n_sims)
+
+cost <- rep(NA, n_sims)
+effect <- rep(NA, n_sims)
+
+for (i in 1:n_sims){
+  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_sd)
+  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_sd)
+}
+
+plot(cost,effect)
+
+cost_effect_ratio <- cost/effect
+
+estimate <- mean(cost_effect_ratio)
+
+intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
+intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
 
 ```
     
+```{r}
+
+cost_diff_mean <- 600
+cost_diff_se <- 400
+cost_df <- 50
+effect_diff_mean <- 3
+effect_diff_se <- 2
+effect_df <- 100
+
+cost_diff_sd <- cost_diff_se*sqrt(cost_df)
+effect_diff_sd <- effect_diff_se*sqrt(effect_df)
+
+n_sims <- 1000
+
+cost <- rep(NA, n_sims)
+effect <- rep(NA, n_sims)
+
+for (i in 1:n_sims){
+  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_sd)
+  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_sd)
+}
+
+?rt()
+
+plot(cost,effect)
+
+cost_effect_ratio <- cost/effect
+
+estimate <- mean(cost_effect_ratio)
+
+intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
+intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
+
+```
 
 ---
