@@ -56,7 +56,6 @@ probability
 
 ```{r task2}
 
-?rnorm()
 
 save_perunit <- 5
 save_perunit_se <- 4
@@ -69,6 +68,25 @@ savings <- rep(NA, n_sims)
 for (i in 1:n_sims) {
   savings[i] <-
     rnorm(1, save_perunit, save_perunit_se) * rnorm(1, market, market_se)
+}
+
+mean(savings)
+
+```
+
+```{r task2 other solution}
+
+save_perunit <- 5
+save_perunit_se <- 4
+market <- 40000
+market_se <- 10000
+
+n_sims <- 10000
+savings <- rep(NA, n_sims)
+
+
+for (i in 1:n_sims) {
+  savings[i] <- (save_perunit + rnorm(1,0,save_perunit_se)) * (market + rnorm(1, 0, market_se))
 }
 
 mean(savings)
@@ -94,10 +112,10 @@ mean(savings)
 
 cost_diff_mean <- 600
 cost_diff_se <- 400
-cost_df <- 50
+cost_df <- 52
 effect_diff_mean <- 3
 effect_diff_se <- 1
-effect_df <- 100
+effect_df <- 102
 
 cost_diff_sd <- cost_diff_se*sqrt(cost_df)
 effect_diff_sd <- effect_diff_se*sqrt(effect_df)
@@ -108,8 +126,8 @@ cost <- rep(NA, n_sims)
 effect <- rep(NA, n_sims)
 
 for (i in 1:n_sims){
-  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_sd)
-  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_sd)
+  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_se)
+  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_se)
 }
 
 plot(cost,effect)
@@ -157,5 +175,57 @@ intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
 intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
 
 ```
+
+```{r}
+
+cost_diff_mean <- 600
+cost_diff_se <- 400
+cost_df <- 52
+effect_diff_mean <- 3
+effect_diff_se <- 1
+effect_df <- 102
+
+n_sims <- 1000
+
+cost <- rep(NA, n_sims)
+effect <- rep(NA, n_sims)
+
+t <- cost_diff_mean/cost_diff_se
+cost_diff_sd <- cost_diff_mean/(cost_diff_mean/cost_diff_se)
+	
+for (i in 1:num_sims) {	
+  treatment_groups = rbinom(cost_df, 1, 0.5)
+  X = cbind(1, treatment_groups)	
+  sigma = sqrt(400 ^ 2 / solve((t(X) %*% X))[2, 2])	
+  error = rnorm(n_cost, mean = 0, sd = sigma)	
+  cost = 100000 + 600 * treatment + error	
+  cost_diff[i] = mean(cost)	
+  	
+  # effect difference	
+  treatment = rbinom(n = n_effect, size = 1, prob = 0.5)	
+  X = cbind(1, treatment)	
+  sigma = sqrt(1 / solve((t(X) %*% X))[2, 2])	
+  error = rnorm(n_effect, mean = 0, sd = sigma)	
+  effect = 100000 + 3 * treatment + error	
+  effect_model = lm(effect ~ treatment)	
+  effect_diff[i] = coef(effect_model)[2]	
+  	
+}	
+	
+	solve((t(X) %*% X))
+	X
+	t(X)
+	
+	
+costEffect.df <- data.frame(cost=cost_diff, effect=effect_diff)	
+	
+ggplot(data=costEffect.df, aes(x=cost, y=effect)) + 	
+      geom_point() +	
+      labs(x="Cost Difference", y="Effectiveness Difference") +	
+      theme_classic()+ 	
+      guides(fill=FALSE)
+
+```
+
 
 ---
