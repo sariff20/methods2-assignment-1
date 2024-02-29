@@ -21,6 +21,8 @@ Please submit your answers on GitHub Classroom.
 
 ```{r task1}
 
+##rlnorm!!
+
 #variables
 men_mean <- 5.13
 men_sd <- 0.17
@@ -37,9 +39,9 @@ exceeding <- 0
 for (i in 1:n_sims) {
   male <- rbinom(n_adults, 1, men_prop)
   weight <- ifelse(male == 1,
-                   rnorm(n_adults, men_mean, men_sd),
-                   rnorm(n_adults, women_mean, women_sd))
-  total_weight <- sum(exp(weight))
+                   rlnorm(n_adults, men_mean, men_sd),
+                   rlnorm(n_adults, women_mean, women_sd))
+  total_weight <- sum(weight)
   if (total_weight > limit) {
     exceeding <- exceeding + 1
   }
@@ -55,7 +57,6 @@ probability
 2. _(5.6 from ROS)_ __Propagation of uncertainty:__ We use a highly idealized setting to illustrate the use of simulations in combining uncertainties. Suppose a company changes its technology for widget production, and a study estimates the cost savings at \$5 per unit, but with a standard error of \$4. Furthermore, a forecast estimates the size of the market (that is, the number of widgets that will be sold) at 40 000, with a standard error of 10 000. Assuming these two sources of uncertainty are independent, use simulation to estimate the total amount of money saved by the new product (that is, savings per unit, multiplied by size of the market).
 
 ```{r task2}
-
 
 save_perunit <- 5
 save_perunit_se <- 4
@@ -108,26 +109,27 @@ mean(savings)
     (b) Use simulation to come up with an estimate, 50% interval, and 95% interval for the incremental cost-effectiveness ratio.
     (c) Repeat, changing the standard error on the difference in effectiveness to 2.0.
     
-```{r task3 - a,b }
+```{r task3 - a,b}
 
+#values
 cost_diff_mean <- 600
 cost_diff_se <- 400
-cost_df <- 52
+cost_df <- 50
+cost_num <- cost_df + 2
 effect_diff_mean <- 3
 effect_diff_se <- 1
-effect_df <- 102
-
-cost_diff_sd <- cost_diff_se*sqrt(cost_df)
-effect_diff_sd <- effect_diff_se*sqrt(effect_df)
+effect_df <- 100
+effect_num <- effect_df + 2
 
 n_sims <- 1000
 
 cost <- rep(NA, n_sims)
 effect <- rep(NA, n_sims)
 
+#simulation
 for (i in 1:n_sims){
-  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_se)
-  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_se)
+  cost[i] <- mean(rnorm(cost_num, cost_diff_mean, cost_diff_se))
+  effect[i] <- mean(rnorm(effect_num, effect_diff_mean, effect_diff_se))
 }
 
 plot(cost,effect)
@@ -135,13 +137,54 @@ plot(cost,effect)
 cost_effect_ratio <- cost/effect
 
 estimate <- mean(cost_effect_ratio)
+estimate
 
 intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
 intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
+intervals_50
+intervals_95
 
 ```
+
+```{r task3 - c}
+
+#values
+cost_diff_mean <- 600
+cost_diff_se <- 400
+cost_df <- 50
+cost_num <- cost_df + 2
+effect_diff_mean <- 3
+effect_diff_se <- 2
+effect_df <- 100
+effect_num <- effect_df + 2
+
+n_sims <- 1000
+
+cost <- rep(NA, n_sims)
+effect <- rep(NA, n_sims)
+
+#simulation
+for (i in 1:n_sims){
+  cost[i] <- mean(rnorm(cost_num, cost_diff_mean, cost_diff_se))
+  effect[i] <- mean(rnorm(effect_num, effect_diff_mean, effect_diff_se))
+}
+
+plot(cost,effect)
+
+cost_effect_ratio <- cost/effect
+
+estimate <- mean(cost_effect_ratio)
+estimate
+
+intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
+intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
+intervals_50
+intervals_95
+
+```
+
     
-```{r}
+```{r trying with changing to standard deviation}
 
 cost_diff_mean <- 600
 cost_diff_se <- 400
@@ -163,8 +206,6 @@ for (i in 1:n_sims){
   effect[i] <- rnorm(1, effect_diff_mean, effect_diff_sd)
 }
 
-?rt()
-
 plot(cost,effect)
 
 cost_effect_ratio <- cost/effect
@@ -176,49 +217,37 @@ intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
 
 ```
 
-```{r}
+```{r trying with adding standard error as error}
 
 cost_diff_mean <- 600
 cost_diff_se <- 400
-cost_df <- 52
+cost_df <- 50
+cost_num <- 50 + 2
 effect_diff_mean <- 3
 effect_diff_se <- 1
-effect_df <- 102
+effect_df <- 100
+effect_num <- 100 + 2
 
-n_sims <- 1000
+num_sims <- 1000
 
-cost <- rep(NA, n_sims)
-effect <- rep(NA, n_sims)
+costs <- rep(NA, num_sims)
+effects <- rep(NA, num_sims)
 
-t <- cost_diff_mean/cost_diff_se
-cost_diff_sd <- cost_diff_mean/(cost_diff_mean/cost_diff_se)
-	
 for (i in 1:num_sims) {	
-  treatment_groups = rbinom(cost_df, 1, 0.5)
-  X = cbind(1, treatment_groups)	
-  sigma = sqrt(400 ^ 2 / solve((t(X) %*% X))[2, 2])	
-  error = rnorm(n_cost, mean = 0, sd = sigma)	
-  cost = 100000 + 600 * treatment + error	
-  cost_diff[i] = mean(cost)	
+  
+  #calculation for cost
+  treatment_groups = rbinom(cost_num, 1, 0.5)
+  cost = 0 + cost_diff_mean * treatment_groups + rnorm(1,0,cost_diff_se)
+  costs[i] = mean(cost)	
   	
-  # effect difference	
-  treatment = rbinom(n = n_effect, size = 1, prob = 0.5)	
-  X = cbind(1, treatment)	
-  sigma = sqrt(1 / solve((t(X) %*% X))[2, 2])	
-  error = rnorm(n_effect, mean = 0, sd = sigma)	
-  effect = 100000 + 3 * treatment + error	
-  effect_model = lm(effect ~ treatment)	
-  effect_diff[i] = coef(effect_model)[2]	
-  	
-}	
-	
-	solve((t(X) %*% X))
-	X
-	t(X)
-	
-	
-costEffect.df <- data.frame(cost=cost_diff, effect=effect_diff)	
-	
+  #calculation for effect
+  treatment_groups = rbinom(effect_num, 1, 0.5)	
+  effect = 0 + effect_diff_mean * treatment_groups + rnorm(1,0,effect_diff_se)	
+  effects[i] = mean(effect)
+}
+
+plot(costs,effects)
+
 ggplot(data=costEffect.df, aes(x=cost, y=effect)) + 	
       geom_point() +	
       labs(x="Cost Difference", y="Effectiveness Difference") +	
