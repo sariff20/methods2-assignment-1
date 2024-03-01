@@ -92,6 +92,8 @@ for (i in 1:n_sims) {
 
 mean(savings)
 
+list <- c(1,2,3)
+mean(list)
 ```
 
 
@@ -128,8 +130,8 @@ effect <- rep(NA, n_sims)
 
 #simulation
 for (i in 1:n_sims){
-  cost[i] <- mean(rnorm(cost_num, cost_diff_mean, cost_diff_se))
-  effect[i] <- mean(rnorm(effect_num, effect_diff_mean, effect_diff_se))
+  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_se)
+  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_se)
 }
 
 plot(cost,effect)
@@ -143,116 +145,6 @@ intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
 intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
 intervals_50
 intervals_95
-
-```
-
-```{r task3 - c}
-
-#values
-cost_diff_mean <- 600
-cost_diff_se <- 400
-cost_df <- 50
-cost_num <- cost_df + 2
-effect_diff_mean <- 3
-effect_diff_se <- 2
-effect_df <- 100
-effect_num <- effect_df + 2
-
-n_sims <- 1000
-
-cost <- rep(NA, n_sims)
-effect <- rep(NA, n_sims)
-
-#simulation
-for (i in 1:n_sims){
-  cost[i] <- mean(rnorm(cost_num, cost_diff_mean, cost_diff_se))
-  effect[i] <- mean(rnorm(effect_num, effect_diff_mean, effect_diff_se))
-}
-
-plot(cost,effect)
-
-cost_effect_ratio <- cost/effect
-
-estimate <- mean(cost_effect_ratio)
-estimate
-
-intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
-intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
-intervals_50
-intervals_95
-
-```
-
-    
-```{r trying with changing to standard deviation}
-
-cost_diff_mean <- 600
-cost_diff_se <- 400
-cost_df <- 50
-effect_diff_mean <- 3
-effect_diff_se <- 2
-effect_df <- 100
-
-cost_diff_sd <- cost_diff_se*sqrt(cost_df)
-effect_diff_sd <- effect_diff_se*sqrt(effect_df)
-
-n_sims <- 1000
-
-cost <- rep(NA, n_sims)
-effect <- rep(NA, n_sims)
-
-for (i in 1:n_sims){
-  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_sd)
-  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_sd)
-}
-
-plot(cost,effect)
-
-cost_effect_ratio <- cost/effect
-
-estimate <- mean(cost_effect_ratio)
-
-intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
-intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
-
-```
-
-```{r trying with adding standard error as error}
-
-cost_diff_mean <- 600
-cost_diff_se <- 400
-cost_df <- 50
-cost_num <- 50 + 2
-effect_diff_mean <- 3
-effect_diff_se <- 1
-effect_df <- 100
-effect_num <- 100 + 2
-
-num_sims <- 1000
-
-costs <- rep(NA, num_sims)
-effects <- rep(NA, num_sims)
-
-for (i in 1:num_sims) {	
-  
-  #calculation for cost
-  treatment_groups = rbinom(cost_num, 1, 0.5)
-  cost = 0 + cost_diff_mean * treatment_groups + rnorm(1,0,cost_diff_se)
-  costs[i] = mean(cost)	
-  	
-  #calculation for effect
-  treatment_groups = rbinom(effect_num, 1, 0.5)	
-  effect = 0 + effect_diff_mean * treatment_groups + rnorm(1,0,effect_diff_se)	
-  effects[i] = mean(effect)
-}
-
-plot(costs,effects)
-
-ggplot(data=costEffect.df, aes(x=cost, y=effect)) + 	
-      geom_point() +	
-      labs(x="Cost Difference", y="Effectiveness Difference") +	
-      theme_classic()+ 	
-      guides(fill=FALSE)
 
 ```
 
