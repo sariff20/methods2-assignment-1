@@ -15,6 +15,14 @@ In the first exercise, we will assume that the population of interest has a prop
 
 Please submit your answers on GitHub Classroom.
 
+```{r setup}
+
+library(pacman)
+p_load(ggplot2)
+
+```
+
+
 ---
 
 1. _(5.2 from ROS)_ __Continuous probability simulation:__ The logarithms of weights (in pounds) of men in the United States are approximately normally distributed with mean 5.13 and standard deviation 0.17; women’s log weights are approximately normally distributed with mean 4.96 and standard deviation 0.20. Suppose 10 adults selected at random step on an elevator with a capacity of 1750 pounds. What is the probability that their total weight exceeds this limit?
@@ -113,40 +121,118 @@ mean(list)
     
 ```{r task3 - a,b}
 
-#values
+#setting parameters
+
+##parameters for estimated difference in costs
 cost_diff_mean <- 600
 cost_diff_se <- 400
-cost_df <- 50
-cost_num <- cost_df + 2
+cost_df <- 52
+
+##parameters for estimated difference in effectiveness
 effect_diff_mean <- 3
 effect_diff_se <- 1
-effect_df <- 100
-effect_num <- effect_df + 2
+effect_df <- 102
 
+##number of simulations
 n_sims <- 1000
 
+##vectors to store values from the simulation
 cost <- rep(NA, n_sims)
 effect <- rep(NA, n_sims)
 
 #simulation
+
 for (i in 1:n_sims){
-  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_se)
-  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_se)
+  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_se) #sampling from normal distribution with the given mean and the standard error of the estimated mean for costs
+  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_se) #sampling from normal distribution with the given mean and the standard error of the estimated mean for effectiveness
 }
 
-plot(cost,effect)
+#making scatterplot for the simulation
+
+costeffect_df <- data.frame(x = cost, y = effect)
+
+costeffect_plot <- ggplot(costeffect_df, aes(x = cost, y = effect)) +
+  geom_point(color = "orange") +
+  labs(
+    x = "draws of cost difference",
+    y = "draws of effectiveness difference",
+    title = "Simulation of Difference Between Costs and Effectiveness of Two Treatments"
+  ) +
+  theme_minimal()
+costeffect_plot
+
+#calculating cost-effectiveness ratio
 
 cost_effect_ratio <- cost/effect
 
+##calculating estimate
 estimate <- mean(cost_effect_ratio)
-estimate
+print(paste("The estimate for the incremental cost-effectiveness ratio is:", estimate))
 
+##calculating intervals
 intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
 intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
-intervals_50
-intervals_95
+print(paste("The 50% interval for the incremental cost-effectiveness ratio is: [", intervals_50[1], ",", intervals_50[2], "]"))
+print(paste("The 95% interval for the incremental cost-effectiveness ratio is:[", intervals_95[1], ",", intervals_95[2], "]"))
 
 ```
 
+```{r task 3 c}
+
+#setting parameters
+
+##parameters for estimated difference in costs
+cost_diff_mean <- 600
+cost_diff_se <- 400
+cost_df <- 52
+
+##parameters for estimated difference in effectiveness
+effect_diff_mean <- 3
+effect_diff_se <- 2
+effect_df <- 102
+
+##number of simulations
+n_sims <- 1000
+
+##vectors to store values from the simulation
+cost <- rep(NA, n_sims)
+effect <- rep(NA, n_sims)
+
+#simulation
+
+for (i in 1:n_sims){
+  cost[i] <- rnorm(1, cost_diff_mean, cost_diff_se) #sampling from normal distribution with the given mean and the standard error of the estimated mean for costs
+  effect[i] <- rnorm(1, effect_diff_mean, effect_diff_se) #sampling from normal distribution with the given mean and the standard error of the estimated mean for effectiveness
+}
+
+#making scatterplot for the simulation
+
+costeffect_df <- data.frame(x = cost, y = effect)
+
+costeffect_plot <- ggplot(costeffect_df, aes(x = cost, y = effect)) +
+  geom_point(color = "lightblue") +
+  labs(
+    x = "draws of cost difference",
+    y = "draws of effectiveness difference",
+    title = "Simulation of Difference Between Costs and Effectiveness of Two Treatments"
+  ) +
+  theme_minimal()
+costeffect_plot
+
+#calculating cost-effectiveness ratio
+
+cost_effect_ratio <- cost/effect
+
+##calculating estimate
+estimate <- mean(cost_effect_ratio)
+print(paste("The estimate for the incremental cost-effectiveness ratio is:", estimate))
+
+##calculating intervals
+intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
+intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
+print(paste("The 50% interval for the incremental cost-effectiveness ratio is: [", intervals_50[1], ",", intervals_50[2], "]"))
+print(paste("The 95% interval for the incremental cost-effectiveness ratio is:[", intervals_95[1], ",", intervals_95[2], "]"))
+
+```
 
 ---
