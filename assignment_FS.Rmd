@@ -189,7 +189,7 @@ cost_df <- 52
 
 ##parameters for estimated difference in effectiveness
 effect_diff_mean <- 3
-effect_diff_se <- 2
+effect_diff_se <- 2 #changing standard error to 2 gives bigger spread in the estimated means
 effect_df <- 102
 
 ##number of simulations
@@ -233,8 +233,6 @@ intervals_50 <- quantile(cost_effect_ratio,c(0.25,0.75))
 intervals_95 <- quantile(cost_effect_ratio,c(0.025,0.975))
 print(paste("The 50% interval for the incremental cost-effectiveness ratio is: [", intervals_50[1], ",", intervals_50[2], "]")) #50% of the time this interval will include our estimate
 print(paste("The 95% interval for the incremental cost-effectiveness ratio is:[", intervals_95[1], ",", intervals_95[2], "]")) #95% of the time this interval will include our estimate
-
-
 ```
 
 ---
